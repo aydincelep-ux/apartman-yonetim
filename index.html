@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartman Yönetim Paneli</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; }
+        h1 { text-align: center; color: #1a2a6c; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { margin: 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .card .amount { font-size: 28px; font-weight: bold; margin-top: 15px; display: block; }
+        .income { border-bottom: 6px solid #2ecc71; color: #27ae60; }
+        .expense { border-bottom: 6px solid #e74c3c; color: #c0392b; }
+        .balance { border-bottom: 6px solid #3498db; color: #2980b9; }
+        .loading { font-style: italic; font-size: 16px; color: #bdc3c7; }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h1>Apartman Finans Durumu</h1>
+    
+    <div class="stats-grid">
+        <div class="card income">
+            <h3>Gelen Para (Ocak)</h3>
+            <span id="gelen" class="amount loading">Yükleniyor...</span>
+        </div>
+        
+        <div class="card expense">
+            <h3>Giden Para (Ocak)</h3>
+            <span id="giden" class="amount loading">Yükleniyor...</span>
+        </div>
+        
+        <div class="card balance">
+            <h3>Kasa Güncel</h3>
+            <span id="kasa" class="amount loading">Yükleniyor...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const api_url = 'https://sheetdb.io/api/v1/pfjtz9yd6l2o9';
+
+    async function verileriCek() {
+        try {
+            const response = await fetch(api_url);
+            const data = await response.json();
+            
+            // Excel tablonun yapısına göre SheetDB verileri dizi (array) olarak döndürür.
+            // Tablodaki "Yıllık Toplam" hücrelerini hedefliyoruz.
+            
+            // "GELEN PARA" tablosundaki Yıllık Toplam satırı (genellikle listenin sonundadır)
+            const gelenToplam = data.find(row => row["Daire Numaraları"] === "Yıllık Toplam")["Yıllık Toplam"];
+            
+            // "GİDEN PARA" tablosundaki Yıllık Toplam satırı
+            const gidenToplam = data.find(row => row["Gider Kalemleri"] === "Yıllık Toplam")["Yıllık Toplam"];
+
+            // Kasada Kalan Para (Örneğinde 1.975 TL olarak görünen hücreyi buluyoruz)
+            // Bu değeri "2025 den devir bakiye" ile toplayan formülün sonucunu Sheets'ten çekebilirsin.
+            // Şimdilik manuel veya tablodaki ilgili satırdan alalım:
+            const kasaKalan = "1.975,00"; 
+
+            document.getElementById('gelen').innerText = "₺" + gelenToplam;
+            document.getElementById('giden').innerText = "₺" + gidenToplam;
+            document.getElementById('kasa').innerText = "₺" + kasaKalan;
+
+        } catch (error) {
+            console.error("Veri çekilemedi:", error);
+            document.querySelectorAll('.amount').forEach(el => el.innerText = "Hata!");
+        }
+    }
+
+    verileriCek();
+</script>
+
+</body>
+</html>
