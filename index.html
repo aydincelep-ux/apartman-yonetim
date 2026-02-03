@@ -1,68 +1,22 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apartman Yönetim Paneli</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 800px; text-align: center; }
-        h1 { color: #1a2a6c; margin-bottom: 30px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0; color: #7f8c8d; font-size: 14px; text-transform: uppercase; }
-        .amount { font-size: 28px; font-weight: bold; margin-top: 15px; display: block; color: #2c3e50; }
-        .income { border-bottom: 6px solid #2ecc71; }
-        .expense { border-bottom: 6px solid #e74c3c; }
-        .balance { border-bottom: 6px solid #3498db; }
-    </style>
-</head>
+<html>
 <body>
-
-<div class="container">
-    <h1>Apartman Finans Durumu</h1>
-    <div class="stats-grid">
-        <div class="card income">
-            <h3>Gelen Para (Ocak)</h3>
-            <span id="gelen" class="amount">...</span>
-        </div>
-        <div class="card expense">
-            <h3>Giden Para (Ocak)</h3>
-            <span id="giden" class="amount">...</span>
-        </div>
-        <div class="card balance">
-            <h3>Kasa Güncel</h3>
-            <span id="kasa" class="amount">...</span>
-        </div>
-    </div>
-</div>
+    <h2>Veri Analiz Ekranı</h2>
+    <p>Aşağıdaki karmaşık yazının ekran görüntüsünü alıp bana gönderin:</p>
+    <pre id="veri-kutusu" style="background: #eee; padding: 10px; border: 1px solid #999; white-space: pre-wrap;">
+        Yükleniyor...
+    </pre>
 
 <script>
-    const api_url = 'https://sheetdb.io/api/v1/pfjtz9yd6l2o9';
-
-    async function verileriCek() {
-        try {
-            const response = await fetch(api_url);
-            const data = await response.json();
-            
-            // Hata payını azaltmak için verileri pozisyona göre çekiyoruz
-            // data[15] genellikle tablonun sonundaki 'Gelen Toplam' satırına denk gelir
-            // data[32] ise 'Giden Toplam' satırına denk gelir.
-            
-            const gelen = data[13] ? data[13]["Ocak"] : "0"; // Ocak ayı gelen toplamı
-            const giden = data[30] ? data[30]["Ocak"] : "0"; // Ocak ayı giden toplamı
-            const kalan = "1.975,00"; // Excel'deki sabit kalan değerin
-
-            document.getElementById('gelen').innerText = "₺" + gelen;
-            document.getElementById('giden').innerText = "₺" + giden;
-            document.getElementById('kasa').innerText = "₺" + kalan;
-
-        } catch (error) {
-            console.error("Hata:", error);
-            document.querySelectorAll('.amount').forEach(el => el.innerText = "Veri Hatası");
-        }
-    }
-    verileriCek();
+    fetch('https://sheetdb.io/api/v1/pfjtz9yd6l2o9')
+    .then(response => response.json())
+    .then(data => {
+        // Gelen veriyi ekrana yazdır
+        document.getElementById('veri-kutusu').innerText = JSON.stringify(data.slice(0, 5), null, 2);
+    })
+    .catch(error => {
+        document.getElementById('veri-kutusu').innerText = "Hata oluştu: " + error;
+    });
 </script>
 </body>
 </html>
