@@ -1,21 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Veri Kontrol</title>
+    <style>
+        body { background: #333; color: #0f0; font-family: monospace; padding: 20px; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
 <body>
-    <h2>Veri Analiz Ekranı</h2>
-    <p>Aşağıdaki karmaşık yazının ekran görüntüsünü alıp bana gönderin:</p>
-    <pre id="veri-kutusu" style="background: #eee; padding: 10px; border: 1px solid #999; white-space: pre-wrap;">
-        Yükleniyor...
-    </pre>
+    <h3>Sistemden Gelen Ham Veri:</h3>
+    <p>Lütfen bu ekranın fotoğrafını çekip gönderin.</p>
+    <hr>
+    <pre id="veri-kutusu">Veri bekleniyor...</pre>
 
 <script>
     fetch('https://sheetdb.io/api/v1/pfjtz9yd6l2o9')
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        // Gelen veriyi ekrana yazdır
-        document.getElementById('veri-kutusu').innerText = JSON.stringify(data.slice(0, 5), null, 2);
+        // Tüm veriyi olduğu gibi ekrana basalım
+        document.getElementById('veri-kutusu').innerText = JSON.stringify(data, null, 2);
     })
-    .catch(error => {
-        document.getElementById('veri-kutusu').innerText = "Hata oluştu: " + error;
+    .catch(err => {
+        document.getElementById('veri-kutusu').innerText = "Hata: " + err;
     });
 </script>
 </body>
